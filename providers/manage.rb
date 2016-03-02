@@ -56,6 +56,9 @@ action :create do
     Chef::Log.warn('This recipe uses search. Chef Solo does not support search unless you install the chef-solo-search cookbook.')
   else
     search(new_resource.data_bag, "groups:#{new_resource.search_group} AND NOT action:remove") do |u|
+
+      next if u.has_key?('environments') and ! u['environments'].include?(node.chef_environment)
+
       u['username'] ||= u['id']
       u['groups'].each do |g|
         users_groups[g] = [] unless users_groups.key?(g)
